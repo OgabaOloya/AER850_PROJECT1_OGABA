@@ -10,4 +10,5 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
-data = pd.read_csv("data/Project 1 Data.csv")
+data = pd.read_csv("AER850_Project1Data/Project 1 Data.csv")
+print('hi')
