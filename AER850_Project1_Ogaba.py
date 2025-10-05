@@ -33,21 +33,21 @@ print("\n\n-----------------Step 2: Data Visualization-----------------\n\n")
 #Setting up boxplot subplots for X, Y, and Z
 plt.figure(figsize=(15,5))
 
-#Box plot for the variable X
+#Histogram for the variable X
 plt.subplot(1,3,1)
 plt.hist(data["X"], bins=20, color="lightgreen", edgecolor="black")
 plt.title("Histogram of X")
 plt.xlabel("X")
 plt.ylabel("Frequency")
 
-#Box plot for the variable Y
+#Histogram for the variable Y
 plt.subplot(1,3,2)
 plt.hist(data["Y"], bins=20, color="lightblue", edgecolor="black")
 plt.title("Histogram of Y")
 plt.xlabel("Y")
 plt.ylabel("Frequency")
 
-#Box plot for the variable Z
+#Histogram for the variable Z
 plt.subplot(1,3,3)
 plt.hist(data["Z"], bins=20, color="salmon", edgecolor="black")
 plt.title("Histogram of Z")
@@ -55,6 +55,36 @@ plt.xlabel("Z")
 plt.ylabel("Frequency")
 
 plt.tight_layout()
+plt.show()
+
+# Computing the mean, std, min, max of X, Y, Z grouped by Step
+summary_table = data.groupby("Step")[["X", "Y", "Z"]].agg(["mean", "std", "min", "max"])
+
+# Creating our figure for Summary Table 
+fig, ax = plt.subplots(figsize=(12, 6))
+ax.axis("off")  # Hide axes
+
+# Convert DataFrame to table for matplotlib display
+table = ax.table(
+    cellText=np.round(summary_table.values, 2),  # Round to 2 decimals
+    rowLabels=summary_table.index,
+    colLabels=["X_mean", "X_std", "X_min", "X_max", 
+               "Y_mean", "Y_std", "Y_min", "Y_max", 
+               "Z_mean", "Z_std", "Z_min", "Z_max"],
+    cellLoc="center",
+    loc="center"
+)
+
+# Adjusting our fonts & sizing for wide tables
+table.auto_set_font_size(False)
+table.set_fontsize(9)  
+table.scale(1.1, 1.2)  
+
+
+for key, cell in table.get_celld().items():
+    cell.set_edgecolor("black")
+
+plt.title("Summary Statistics by Step", fontsize=14)
 plt.show()
 
 #------------------------------------------------------------------------------
@@ -228,7 +258,7 @@ print("Classification Report:\n", classification_report(y_test, y_pred_svm, zero
 
 cm_svm = confusion_matrix(y_test, y_pred_svm)
 sns.heatmap(cm_svm, annot=True, fmt="d", cmap="Oranges")
-plt.title("Confusion Matrix - SVM (Best Params)")
+plt.title("Confusion Matrix - SVM")
 plt.xlabel("Predicted Value"); plt.ylabel("Actual Value")
 plt.show()
 
@@ -344,7 +374,7 @@ print("\nBest thresholds by model (max F1, one-vs-rest on Step =", positiveclass
 for k, v in best_thresholds_summary.items():
     print(f"{k}: t* = {v['best_threshold']:.1f}  "
           f"(Prescision = {v['best_precision']:.3f}, Recall = {v['best_recall']:.3f}, F1 = {v['best_f1']:.3f})")
-
+    
 
 #-------------------------------------
 # Part F: Plotting of ROC curves for all models (One-vs-Rest)
@@ -460,7 +490,7 @@ y_pred_svm_rand = best_svm_rand.predict(X_test)
 print("Classification Report:\n", classification_report(y_test, y_pred_svm_rand, zero_division=0))
 cm_svm_rand = confusion_matrix(y_test, y_pred_svm_rand)
 sns.heatmap(cm_svm_rand, annot=True, fmt="d", cmap="Purples")
-plt.title("Confusion Matrix - SVM (RandomizedSearch)")
+plt.title("Confusion Matrix - SVM (RandomizedSearch -- Best Params)")
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.show()
@@ -518,24 +548,23 @@ print("\n\n-----------------Step 7: Model Evaluation-----------------\n\n")
 #Importing our Joblib toolkit
 import joblib 
 
-# Save the selected best model (replace with your chosen one, e.g. Logistic Regression)
+# Saving the selected best model 
 final_model = best_regression  
 joblib.dump(final_model, "best_model.pkl")
 print("\nModel saved as best_model.pkl")
 
-# Load and use it
 loaded_model = joblib.load("best_model.pkl")
 
 # Define the test points as full (X, Y, Z) coordinates
 test_points = pd.DataFrame([
     [9.375, 3.0625, 1.51],
     [6.995, 5.125, 0.3875],
-    [0.0,   3.0625, 1.93],   # keeping your original zero instead of 0.3
+    [0.0,   3.0625, 1.93],   
     [9.4,   3.0,    1.8],
     [9.4,   3.0,    1.3]
 ], columns=["X", "Y", "Z"])
 
-# Make predictions
+# Making our predictions
 predictions = loaded_model.predict(test_points)
 
 # Our final results from our Test Points 
