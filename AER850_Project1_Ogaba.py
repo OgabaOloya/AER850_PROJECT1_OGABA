@@ -57,6 +57,25 @@ plt.ylabel("Frequency")
 plt.tight_layout()
 plt.show()
 
+#3D Space representation of our data 
+fig = plt.figure(figsize=(10, 7))
+axes = fig.add_subplot(111, projection='3d')
+
+scatter = axes.scatter(
+    data['X'], data['Y'], data['Z'],
+    c=data['Step'], cmap='tab20'
+)
+
+axes.set_xlabel("X")
+axes.set_ylabel("Y")
+axes.set_zlabel("Z")
+axes.set_title("3D Visualization of X, Y, Z (Sorted by Coloured Steps)")
+
+legend = axes.legend(*scatter.legend_elements(), title="Step", bbox_to_anchor = (1.15, 1), loc = 'upper left')
+
+plt.show()
+
+
 # Computing the mean, std, min, max of X, Y, Z grouped by Step
 summary_table = data.groupby("Step")[["X", "Y", "Z"]].agg(["mean", "std", "min", "max"])
 
